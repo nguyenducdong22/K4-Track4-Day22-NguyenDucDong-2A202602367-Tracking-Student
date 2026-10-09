@@ -26,6 +26,19 @@ import sys
 from pathlib import Path
 
 PRACTICE_VIDEO = "video_1"
+# Tên benchmark chỉ dùng để đặt tên thư mục trong cây TrackEval.
+DEFAULT_EVAL_CONFIG = {"benchmark": "LAB", "split": "train"}
+
+# TrackEval chạy trong tiến trình con nên phải vá alias NumPy ngay trong tiến trình đó.
+_TRACKEVAL_BOOTSTRAP = (
+    "import sys, runpy, numpy as np\n"
+    "for _n, _t in (('float', float), ('int', int), ('bool', bool)):\n"
+    "    if not hasattr(np, _n):\n"
+    "        setattr(np, _n, _t)\n"
+    "script = sys.argv[1]\n"
+    "sys.argv = sys.argv[1:]\n"
+    "runpy.run_path(script, run_name='__main__')\n"
+)
 
 
 def _patch_numpy_aliases() -> None:
@@ -52,6 +65,9 @@ def _load_eval_config(lab_data_root: Path) -> dict:
     """
     config_path = lab_data_root / PRACTICE_VIDEO / "eval_config.json"
     if not config_path.exists():
+        if (lab_data_root / PRACTICE_VIDEO / "gt" / "gt.txt").exists():
+            print(f"[cảnh báo] Không thấy {config_path}; dùng cấu hình mặc định benchmark=LAB, split=train.")
+            return dict(DEFAULT_EVAL_CONFIG)
         raise FileNotFoundError(
             f"Không thấy {config_path}. Dùng đúng gói lab_data giảng viên phát "
             "(file này đi kèm nhãn của video luyện)."
@@ -105,6 +121,8 @@ def run_trackeval(trackeval_root: Path, run_name: str, benchmark: str, split: st
     """
     cmd = [
         sys.executable,
+        "-c",
+        _TRACKEVAL_BOOTSTRAP,
         str(trackeval_root / "scripts" / "run_mot_challenge.py"),
         "--GT_FOLDER", str(trackeval_root / "data" / "gt" / "mot_challenge"),
         "--TRACKERS_FOLDER", str(trackeval_root / "data" / "trackers" / "mot_challenge"),
