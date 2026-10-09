@@ -1,0 +1,6 @@
+boxes,ids,box_per_frame,mean_len,short_frac,ids_per_100box,video,tracker,conf,iou,frames,sec
+4991,62,8.32,80.5,0.355,1.242,video_1,botsort,0.3,0.7,all,60.1
+13821,62,13.16,222.9,0.065,0.449,video_2,botsort,0.15,0.5,all,106.9
+4856,137,5.8,35.4,0.343,2.821,video_3,ocsort,0.3,0.5,all,25.4
+6300,81,7.0,77.8,0.333,1.286,video_4,deepocsort,0.3,0.5,all,91.4
+3333,79,4.44,42.2,0.228,2.37,video_5,botsort,0.15,0.5,all,76.1
